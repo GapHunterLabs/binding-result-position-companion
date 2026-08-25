@@ -1,0 +1,49 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <id>dev.gaphunter.bindingresultpositioncompanion</id>
+    <name>Binding Result Position Companion</name>
+    <vendor>Gap Hunter Labs</vendor>
+    <description><![CDATA[
+        <p>Warning icon on a Spring MVC controller method parameter
+        annotated <code>@Valid</code>/<code>@Validated</code> whose
+        matching <code>BindingResult</code>/<code>Errors</code>
+        parameter exists somewhere in the method signature, but isn't
+        the parameter immediately following it -- Spring's own
+        <code>ErrorsMethodArgumentResolver</code> javadoc is explicit:
+        "An Errors method argument is expected to appear immediately
+        after the model attribute in the method signature." When
+        another parameter is inserted between them, Spring can't
+        resolve the binding result for that attribute at all.</p>
+        <p><b>100% static text/PSI analysis</b> -- matches annotation/
+        type names by simple text, so it works whether the real Spring
+        jar is on the classpath or not. Java and Kotlin. Confirmed gap:
+        JetBrains' own bundled Spring MVC plugin only offers
+        autocompletion for BindingResult parameters
+        (<code>BindingResultParameterProvider</code>), it does not
+        validate correct positioning -- confirmed by extracting and
+        reading the plugin's own <code>plugin.xml</code> directly.</p>
+        <p>Stated honestly: v0.1 only flags the case where a
+        <code>BindingResult</code>/<code>Errors</code> parameter DOES
+        exist somewhere but isn't immediately next -- a
+        <code>@Valid</code> parameter with no
+        <code>BindingResult</code>/<code>Errors</code> at all is a
+        legitimate, common pattern and is never flagged.</p>
+        <p>Free. No license nags, no telemetry, no network calls.</p>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.java</depends>
+    <depends>org.jetbrains.kotlin</depends>
+
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <supportsKotlinPluginMode supportsK1="true" supportsK2="true"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <codeInsight.lineMarkerProvider language="JAVA"
+            implementationClass="dev.gaphunter.bindingresultpositioncompanion.gutter.MisplacedBindingResultLineMarkerProvider"/>
+        <codeInsight.lineMarkerProvider language="kotlin"
+            implementationClass="dev.gaphunter.bindingresultpositioncompanion.gutter.MisplacedBindingResultLineMarkerProvider"/>
+        <notificationGroup id="Binding Result Position Companion" displayType="BALLOON"/>
+    </extensions>
+</idea-plugin>
